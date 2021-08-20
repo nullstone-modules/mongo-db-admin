@@ -8,10 +8,10 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 	"github.com/nullstone-modules/mongo-db-admin/mongodb"
+	"github.com/nullstone-modules/mongo-db-admin/workflows"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
-	"time"
 )
 
 const (
@@ -30,46 +30,38 @@ func main() {
 }
 
 func HandleRequest(ctx context.Context, event AdminEvent) error {
-	switch event.Type {
-	case eventTypeCreateUser:
-		return ensureUser(ctx, event.Metadata)
-	default:
-		return fmt.Errorf("unknown event %q", event.Type)
-	}
-}
-
-func ensureUser(ctx context.Context, metadata map[string]string) error {
-	user := mongodb.User{}
-	user.Username, _ = metadata["username"]
-	if user.Username == "" {
-		return fmt.Errorf("cannot create user: username is required")
-	}
-	user.Password, _ = metadata["password"]
-	if user.Password == "" {
-		return fmt.Errorf("cannot create user: password is required")
-	}
-	user.DatabaseName, _ = metadata["databaseName"]
-	if user.DatabaseName == "" {
-		return fmt.Errorf("cannot create user: databaseName is required")
-	}
-
-	client, err := getClient(ctx)
+	connUrl, err := getConnectionUrl(ctx)
 	if err != nil {
-		return fmt.Errorf("error connecting to mongo: %w", err)
+		return err
+	}
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connUrl))
+	if err != nil {
+		return fmt.Errorf("error connecting to db: %w", err)
 	}
 	defer client.Disconnect(ctx)
 
-	return user.Create(client)
-}
-
-func getClient(ctx context.Context) (*mongo.Client, error) {
-	connUrl, err := getConnectionUrl(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("error retrieving mongo connection url: %w", err)
+	switch event.Type {
+	case eventTypeCreateUser:
+		newUser := mongodb.User{
+			RoleName: "dbOwner", // readWrite|dbAdmin|userAdmin
+		}
+		newUser.Name, _ = event.Metadata["username"]
+		if newUser.Name == "" {
+			return fmt.Errorf("cannot create user: username is required")
+		}
+		newUser.Password, _ = event.Metadata["password"]
+		if newUser.Password == "" {
+			return fmt.Errorf("cannot create user: password is required")
+		}
+		newUser.DatabaseName, _ = event.Metadata["databaseName"]
+		if newUser.DatabaseName == "" {
+			return fmt.Errorf("cannot create user: databaseName is required")
+		}
+		return workflows.EnsureUser(client, newUser)
+	default:
+		return fmt.Errorf("unknown event %q", event.Type)
 	}
-	timeoutCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
-	defer cancel()
-	return mongo.Connect(timeoutCtx, options.Client().ApplyURI(connUrl))
 }
 
 func getConnectionUrl(ctx context.Context) (string, error) {
