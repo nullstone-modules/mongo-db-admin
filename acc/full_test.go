@@ -71,12 +71,11 @@ func TestFull(t *testing.T) {
 	// Attempt to retrieve them
 	cursor, err := appDb.Collection("todos").Find(ctx, bson.D{})
 	require.NoError(t, err, "find todos")
-	want := []bson.M{
-		{"name": "item1"},
-		{"name": "item2"},
-		{"name": "item3"},
-	}
 	var got []bson.M
 	require.NoError(t, cursor.All(ctx, &got), "scan todos")
-	assert.Equal(t, want, got)
+	results := make([]string, 0)
+	for _, result := range got {
+		results= append(results, result["name"].(string))
+	}
+	assert.Equal(t, []string{"item1", "item2", "item3"}, results)
 }
