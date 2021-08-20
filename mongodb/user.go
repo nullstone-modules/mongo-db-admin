@@ -34,7 +34,7 @@ func (u User) Create(client *mongo.Client) error {
 		{"pwd", u.Password},
 		{"roles", []bson.M{{"role": u.RoleName, "db": u.DatabaseName}}},
 	}
-	result := client.Database("admin").RunCommand(nil, command)
+	result := client.Database(u.DatabaseName).RunCommand(nil, command)
 	if err := result.Err(); err != nil {
 		return fmt.Errorf("error creating user: %w", err)
 	}
