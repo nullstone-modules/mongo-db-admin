@@ -14,3 +14,14 @@ package: tools
 		&& build-lambda-zip --output files/mongo-db-admin.zip files/mongo-db-admin \
 		&& tar -cvzf aws-module.tgz *.tf files/mongo-db-admin.zip \
 		&& mv aws-module.tgz ../../
+
+acc: acc-up acc-run acc-down
+
+acc-up:
+	cd acc && docker-compose -p mongo-db-admin-acc up -d db
+
+acc-run:
+	ACC=1 gotestsum ./acc/...
+
+acc-down:
+	cd acc && docker-compose -p mongo-db-admin-acc down
