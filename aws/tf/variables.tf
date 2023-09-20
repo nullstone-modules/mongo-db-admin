@@ -37,14 +37,16 @@ variable "password" {
 
 variable "network" {
   description = "Network configuration"
-  type = object({
+  type        = object({
     vpc_id : string
+    mongo_security_group_id : string
     security_group_ids : list(string)
     subnet_ids = list(string)
   })
   default = {
-    vpc_id             = ""
-    security_group_ids = []
-    subnet_ids         = []
+    vpc_id                  = ""
+    mongo_security_group_id = ""
+    security_group_ids      = []
+    subnet_ids              = []
   }
 }
