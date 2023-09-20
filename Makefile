@@ -7,7 +7,7 @@ tools:
 
 build:
 	mkdir -p ./aws/tf/files
-	GOOS=linux GOARCH=amd64 go build -o ./aws/tf/files/mongo-db-admin ./aws/
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o ./aws/tf/files/mongo-db-admin ./aws/
 
 package: tools
 	cd ./aws/tf \
