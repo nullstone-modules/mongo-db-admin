@@ -8,6 +8,12 @@ variable "tags" {
   type        = map(string)
 }
 
+variable "protocol" {
+  description = "The protocol to use when connecting to the database cluster. Defaults to 'mongodb'"
+  type        = string
+  default     = "mongodb"
+}
+
 variable "host" {
   description = "The database cluster host to connect"
   type        = string

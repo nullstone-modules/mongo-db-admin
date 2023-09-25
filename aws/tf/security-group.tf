@@ -13,7 +13,7 @@ resource "aws_security_group_rule" "this-to-world-https" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
-resource "aws_security_group_rule" "this-to-postgres" {
+resource "aws_security_group_rule" "this-to-mongo" {
   security_group_id        = aws_security_group.db_admin.id
   protocol                 = "tcp"
   type                     = "egress"
@@ -22,7 +22,7 @@ resource "aws_security_group_rule" "this-to-postgres" {
   source_security_group_id = var.network.mongo_security_group_id
 }
 
-resource "aws_security_group_rule" "postgres-from-this" {
+resource "aws_security_group_rule" "mongo-from-this" {
   security_group_id        = var.network.mongo_security_group_id
   protocol                 = "tcp"
   type                     = "ingress"

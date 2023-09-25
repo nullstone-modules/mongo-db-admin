@@ -5,5 +5,5 @@ resource "aws_secretsmanager_secret" "db_admin_pg" {
 
 resource "aws_secretsmanager_secret_version" "db_admin_pg" {
   secret_id     = aws_secretsmanager_secret.db_admin_pg.id
-  secret_string = "mongodb://${urlencode(var.username)}:${urlencode(var.password)}@${var.host}:${var.port}/${urlencode(var.database)}"
+  secret_string = "${var.protocol}://${urlencode(var.username)}:${urlencode(var.password)}@${var.host}:${var.port}/${urlencode(var.database)}"
 }
