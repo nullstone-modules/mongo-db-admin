@@ -19,7 +19,6 @@ resource "aws_security_group_rule" "this-to-mongo" {
   type                     = "egress"
   from_port                = 0
   to_port                  = 0
-  cidr_blocks              = ["0.0.0.0/0"]
   source_security_group_id = var.network.mongo_security_group_id
 }
 
@@ -29,6 +28,5 @@ resource "aws_security_group_rule" "mongo-from-this" {
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
-  cidr_blocks              = ["0.0.0.0/0"]
   source_security_group_id = aws_security_group.db_admin.id
 }
