@@ -32,6 +32,7 @@ func (u User) Create(client *mongo.Client) error {
 	command := bson.D{
 		{"createUser", u.Name},
 		{"pwd", u.Password},
+		{"roles", []bson.M{}},
 	}
 	result := client.Database(u.DatabaseName).RunCommand(nil, command)
 	if err := result.Err(); err != nil {
