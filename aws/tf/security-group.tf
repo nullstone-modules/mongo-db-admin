@@ -24,7 +24,7 @@ resource "aws_security_group_rule" "this-to-mongo" {
 
 resource "aws_security_group_rule" "mongo-from-this" {
   security_group_id        = var.network.mongo_security_group_id
-  protocol                 = "tcp"
+  protocol                 = "-1"
   type                     = "ingress"
   from_port                = 0
   to_port                  = 0
