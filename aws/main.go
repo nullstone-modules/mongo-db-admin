@@ -44,7 +44,7 @@ func HandleRequest(ctx context.Context, event AdminEvent) error {
 	switch event.Type {
 	case eventTypeCreateUser:
 		newUser := mongodb.User{
-			RoleName: "dbOwner", // readWrite|dbAdmin|userAdmin
+			RoleName: "dbAdmin", // readWrite|dbAdmin|userAdmin
 		}
 		newUser.Name, _ = event.Metadata["username"]
 		if newUser.Name == "" {
